@@ -9,27 +9,56 @@
 // Include Particle Device OS APIs
 #include "Particle.h"
 
-// Let Device OS manage the connection to the Particle Cloud
 SYSTEM_MODE(AUTOMATIC);
-
-// Run the application and system concurrently in separate threads
 SYSTEM_THREAD(ENABLED);
-
-// Show system, cloud connectivity, and application logs over USB
-// View logs with CLI using 'particle serial monitor --follow'
 SerialLogHandler logHandler(LOG_LEVEL_INFO);
+
+uint16_t pin1 = D7;
+String needAlert = "no";
+Ledger deviceConfig;
+int delayRate = 1000;
+
+void regSync(Ledger ledger);    
 
 // setup() runs once, when the device is first turned on
 void setup() {
-  // Put initialization like pinMode and begin functions here
+ 
+  pinMode(pin1, OUTPUT);
+
+  deviceConfig = Particle.ledger("cloud-to-photon");   //Name of the ledger in the particle console
+  deviceConfig.onSync(regSync);
+
+  regSync(deviceConfig);
+
 }
 
-// loop() runs over and over again, as quickly as it can execute.
 void loop() {
-  // The core of your code will likely live here.
 
-  // Example: Publish event to cloud every 10 seconds. Uncomment the next 3 lines to try it!
-  // Log.info("Sending Hello World to the cloud!");
-  // Particle.publish("Hello world!");
-  // delay( 10 * 1000 ); // milliseconds and blocking - see docs for more info!
+ /* 
+    digitalWrite(pin1, HIGH);
+    delay(delayRate);
+    Particle.publish("light", "on", PRIVATE);
+    digitalWrite(pin1, LOW);
+    delay(delayRate);
+    Particle.publish("light", "off", PRIVATE);
+*/
+  if (needAlert == "yes") {
+    digitalWrite(pin1, HIGH);
+    Particle.publish("tempCheck", "TEMPERATURE OUT OF RANGE. CHECK DEVICE", PRIVATE);
+    delay(delayRate);
+    } else {
+    digitalWrite(pin1, LOW);
+    Particle.publish("tempCheck", "Temperature in range", PRIVATE);
+    delay(delayRate);
+  }
+
+
+}
+
+void regSync(Ledger ledger)
+{
+
+    LedgerData data = deviceConfig.get();
+    needAlert = data["needAlert"].asString();   
+    //delayRate = data["delayRate"].asInt();                       
 }
