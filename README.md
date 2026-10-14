@@ -15,3 +15,4 @@ One is named cloud-to-boron, one is named cloud-to-photon, copy data as found in
 
 Set up logic function to match Logic Function file, replacing the ledger IDs with the newly created ones. Set up logic function trigger to match Logic Function Trigger file.
 
+Please see the OnePager (either text only or PDF, they are the same content, different formats) and "particle arch diagram" for the Architecture diagram per project requirements.
